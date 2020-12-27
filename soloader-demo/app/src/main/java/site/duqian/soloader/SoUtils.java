@@ -11,23 +11,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * Description:工具类
- *
- *
  */
 public class SoUtils {
 
 
-
     public static boolean isX86Phone() {
         final String archType = getCpuArchType();
-        return !TextUtils.isEmpty(archType) && "x86".equals(archType.toLowerCase());
+        return !TextUtils.isEmpty(archType) && "so/x86".equals(archType.toLowerCase());
     }
 
     public static String getCpuArchType() {
@@ -46,26 +46,115 @@ public class SoUtils {
         return arch;
     }
 
-    public static boolean copyAssetsDirectory(Context context, String fromAssetPath, String toPath) {
-        try {
-            AssetManager assetManager = context.getAssets();
-            String[] files = context.getAssets().list(fromAssetPath);
-            if (isExist(toPath)) {
-                deleteFile(toPath);
-            } else {
-                new File(toPath).mkdirs();
-            }
-            boolean res = true;
-            for (String file : files)
-                if (file.contains(".")) {
-                    res &= copyAssetFile(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
-                } else {
-                    res &= copyAssetsDirectory(context, fromAssetPath + "/" + file, toPath + "/" + file);
+    /**
+     * 把so文件从asset目录拷贝到私有目录
+     *
+     * @param context
+     * @param assetSoPath
+     * @param out
+     * @return
+     */
+    public static void copyAssetsDirectory(Context context, String assetSoPath, List<String> out) throws Exception {
+        AssetManager assetManager = context.getAssets();
+        String[] files = context.getAssets().list(assetSoPath);
+        if (files == null || files.length == 0) {
+            return;
+        }
+
+        for (String path : files) {
+
+            if (path.contains(".")) {
+                //so/armeabi
+                String dirName = getParentDir(assetSoPath);
+                File dir = context.getDir("libs", Context.MODE_PRIVATE);
+                dir = new File(dir, dirName);
+                if (!dir.exists()) {
+                    dir.mkdirs();
                 }
-            return res;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+                String targetSoFilePath = dir.getAbsolutePath() + "/" + path;
+                boolean b = copyAssetFile(assetManager, assetSoPath + "/" + path, targetSoFilePath);
+                if (b){
+                    out.add(targetSoFilePath);
+                }
+            } else {
+                copyAssetsDirectory(context, assetSoPath + "/" + path, out);
+            }
+
+            /**
+             *    if (file.contains(".")) {
+             *                     res &= copyAssetFile(assetManager, assetSoPath + "/" + file, toPath + "/" + file);
+             *                 } else {
+             *                     res &= copyAssetsDirectory(context, assetSoPath + "/" + file, toPath + "/" + file);
+             *                 }
+             */
+
+        }
+    }
+
+
+    /**
+     * 把so文件从sd目录拷贝到私有目录
+     *
+     * @param context
+     * @param sdSoPath
+     * @param out
+     */
+    public static void copySDDirectory(Context context, String sdSoPath, List<String> out) throws Exception {
+        File[] files = new File(sdSoPath).listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        for (int i = 0; i < files.length; i++) {
+            File so = files[i];
+            if (so.exists()) {
+                File dir = context.getDir("libs", Context.MODE_PRIVATE);
+                String dirName = getParentDir(so);
+
+                dir = new File(dir, dirName);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File target = new File(dir, so.getName());
+                if (target.exists()) {
+                    out.add(target.getAbsolutePath());
+                    continue;
+                }
+                if (!target.exists()) {
+                    target.createNewFile();
+                }
+                fileCopy(so, target);
+                out.add(target.getAbsolutePath());
+            }
+        }
+    }
+
+    public static String getParentDir(File file) {
+        String strParentDirectory = file.getParent();
+        return getParentDir(strParentDirectory);
+    }
+    public static String getParentDir(String path) {
+        String resultParentDirectory=path.replaceAll("\\\\", "/");
+        String arr[] = resultParentDirectory.split("/");
+        return arr[arr.length-1];
+    }
+    public static void fileCopy(File source, File target) throws IOException {
+        FileChannel inChannel = new FileInputStream(source).getChannel();
+        FileChannel outChannel = new FileOutputStream(target).getChannel();
+        try {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+            int maxCount = (64 * 1024 * 1024) - (32 * 1024);
+            long size = inChannel.size();
+            long position = 0;
+            while (position < size) {
+                position += inChannel.transferTo(position, maxCount, outChannel);
+            }
+        } finally {
+            if (inChannel != null) {
+                inChannel.close();
+            }
+            if (outChannel != null) {
+                outChannel.close();
+            }
         }
     }
 
@@ -128,17 +217,23 @@ public class SoUtils {
                 fos.write(buf, 0, read);
             }
             fos.flush();
-            fos.close();
-            bis.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                bis.close();
-                fos.close();
+                if (bis != null) {
+                    bis.close();
+                }
+
             } catch (Exception e) {
-                e.printStackTrace();
+            }
+
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (Exception e) {
             }
         }
         return false;
