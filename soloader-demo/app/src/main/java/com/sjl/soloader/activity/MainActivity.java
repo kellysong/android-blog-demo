@@ -55,17 +55,18 @@ public class MainActivity extends BaseActivity {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Log.i("SIMPLE_LOGGER", "SUPPORTED ABI:" + Arrays.toString(Build.SUPPORTED_ABIS));
+            Log.i(TAG, "SUPPORTED ABI:" + Arrays.toString(Build.SUPPORTED_ABIS));
         }
     }
 
     public void btnSoLoad(View view) {
         startLoadSoFromLocalPath();
         libraryExists = checkSoFile(LIBRARIES);
+        //原生so库默认存储路径
         ApplicationInfo applicationInfo = getApplicationInfo();
         Log.i(TAG, "onCreate: " + applicationInfo.nativeLibraryDir);
         if (!libraryExists) {
-            showToast("so没找到");
+            Log.w(TAG, "so没找到");
         }
     }
 
@@ -122,7 +123,10 @@ public class MainActivity extends BaseActivity {
                 //加载so库
                 if (b && new File(soPath).exists()) {
                     final String soName = soPath.substring(soPath.lastIndexOf("/") + 1, soPath.lastIndexOf(".")).substring(3);
-//                            System.loadLibrary(soName);
+                /*    final String soName = soPath.substring(soPath.lastIndexOf("/") + 1, soPath.lastIndexOf(".")).substring(3);
+                    System.loadLibrary(soName);
+                    //System.load(soPath); //load使用的是文件绝对路径
+                    */
                     //or
                     ReLinker.loadLibrary(this, soName, new ReLinker.LoadListener() {
                         @Override

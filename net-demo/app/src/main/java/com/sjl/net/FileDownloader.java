@@ -11,6 +11,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -26,6 +27,7 @@ import okhttp3.ResponseBody;
  * @copyright(C) 2018 song
  */
 public class FileDownloader {
+    static CompositeDisposable mDisposable = new CompositeDisposable();
 
 
     /**
@@ -44,6 +46,7 @@ public class FileDownloader {
                 .subscribe(new Observer<ResponseBody>() {
                     @Override
                     public void onSubscribe(Disposable d) {
+                        mDisposable.add(d);
                     }
 
                     @Override
@@ -53,7 +56,7 @@ public class FileDownloader {
                         long responseLength;
                         FileOutputStream fos = null;
                         try {
-                            byte[] buf = new byte[2048];
+                            byte[] buf = new byte[1024*8];
                             int len;
                             responseLength = responseBody.contentLength();
                             inputStream = responseBody.byteStream();
@@ -126,6 +129,7 @@ public class FileDownloader {
                 });
     }
 
+
     /**
      * 下载文件法2(使用RXJava更新UI)
      *
@@ -152,7 +156,7 @@ public class FileDownloader {
                                 long responseLength = 0;
                                 FileOutputStream fos = null;
                                 try {
-                                    byte[] buf = new byte[2048];
+                                    byte[] buf = new byte[1024*8];
                                     int len = 0;
                                     responseLength = responseBody.contentLength();
                                     inputStream = responseBody.byteStream();
@@ -217,6 +221,7 @@ public class FileDownloader {
                 .subscribe(new Observer<DownloadInfo>() {
                     @Override
                     public void onSubscribe(Disposable d) {
+                        mDisposable.add(d);
                     }
 
                     @Override
@@ -234,5 +239,9 @@ public class FileDownloader {
                         progressHandler.onCompleted(downloadInfo.getFile());
                     }
                 });
+    }
+
+    public static void cancelDownload(){
+        mDisposable.clear();
     }
 }
