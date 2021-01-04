@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void btnSoLoad(View view) {
-        startLoadSoFromLocalPath();
+        loadSoFromAssetPathCopy();
         libraryExists = checkSoFile(LIBRARIES);
         //原生so库默认存储路径
         ApplicationInfo applicationInfo = getApplicationInfo();
@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void startLoadSoFromLocalPath() {
+    private void loadSoFromAssetPathCopy() {
         List<String> out = new ArrayList<>();
         try {
             SoUtils.copyAssetsDirectory(this, "so", out);
@@ -124,10 +124,10 @@ public class MainActivity extends BaseActivity {
                 if (b && new File(soPath).exists()) {
                     final String soName = soPath.substring(soPath.lastIndexOf("/") + 1, soPath.lastIndexOf(".")).substring(3);
                 /*    final String soName = soPath.substring(soPath.lastIndexOf("/") + 1, soPath.lastIndexOf(".")).substring(3);
-                    System.loadLibrary(soName);
+                    System.loadLibrary(soName); //加载有可能直接崩掉
                     //System.load(soPath); //load使用的是文件绝对路径
                     */
-                    //or
+                    //or 使用第三方库加载，这个加载报错回调failure，不会直接崩溃，底层也是 System.load实现，只不过加载之前做了一些验证
                     ReLinker.loadLibrary(this, soName, new ReLinker.LoadListener() {
                         @Override
                         public void success() {
@@ -142,7 +142,6 @@ public class MainActivity extends BaseActivity {
                     success = true;
                     break;
                 }
-
             }
         }
         return success;
