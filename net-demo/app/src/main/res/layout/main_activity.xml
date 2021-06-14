@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.sjl.net.MainActivity">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="downloadTest"
+        android:text="基于RxJava2.0+Retrofit2.0的文件下载实现（带进度，非覆写ResponseBody和拦截器）"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="uploadTest"
+        android:text="基于RxJava2.0+Retrofit2.0文件分片上传（带进度）"/>
+
+
+
+
+</LinearLayout>

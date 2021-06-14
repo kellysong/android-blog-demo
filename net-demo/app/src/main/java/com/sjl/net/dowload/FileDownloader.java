@@ -1,4 +1,4 @@
-package com.sjl.net;
+package com.sjl.net.dowload;
 
 
 import java.io.File;
@@ -243,5 +243,6 @@ public class FileDownloader {
 
     public static void cancelDownload(){
         mDisposable.clear();
+
     }
 }
