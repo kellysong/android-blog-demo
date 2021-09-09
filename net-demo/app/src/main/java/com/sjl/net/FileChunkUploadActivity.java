@@ -162,14 +162,19 @@ public class FileChunkUploadActivity extends BaseActivity {
                         fileChunkReq.fileSize = totalSize;
                         fileChunkReq.offset = offset;
                         fileChunkReq.uuid = UUID;
-                        emitter.onNext(fileChunkReq);
-                        //下一个偏移量
-                        offset += block.length;
+                        if (!emitter.isDisposed()){
+                            emitter.onNext(fileChunkReq);
+                            //下一个偏移量
+                            offset += block.length;
+                        }
                     }
                 }
-                emitter.onComplete();
+                if (!emitter.isDisposed()){
+                    emitter.onComplete();
+                }
+
             }
-        }).flatMap(new Function<FileChunkReq, ObservableSource<ResponseResult>>() {
+        }).concatMap(new Function<FileChunkReq, ObservableSource<ResponseResult>>() {
             @Override
             public ObservableSource<ResponseResult> apply(FileChunkReq fileChunkReq) throws Exception {
                 return upload2(fileChunkReq);

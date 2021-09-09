@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".FileDownloadActivity" />
         <activity android:name=".FileChunkUploadActivity" />
+        <activity android:name=".MultiThreadDownloadActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

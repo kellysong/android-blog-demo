@@ -20,5 +20,9 @@
 
 
 
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="downloadTest2"
+        android:text="基于RxJava2.0+Retrofit2.0的多线程文件下载实现"/>
 </LinearLayout>

@@ -55,4 +55,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    public void downloadTest2(View view) {
+        openActivity(MultiThreadDownloadActivity.class);
+    }
 }
