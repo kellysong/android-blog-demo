@@ -69,12 +69,11 @@ public class FileDownloader {
                             }
                             fos = new FileOutputStream(file);
                             int progress = 0;
-                            int lastProgress;
+                            int lastProgress = -1;
                             long startTime = System.currentTimeMillis(); // 开始下载时获取开始时间
                             while ((len = inputStream.read(buf)) != -1) {
                                 fos.write(buf, 0, len);
                                 total += len;
-                                lastProgress = progress;
                                 progress = (int) (total * 100 / responseLength);
                                 long curTime = System.currentTimeMillis();
                                 long usedTime = (curTime - startTime) / 1000;
@@ -83,12 +82,13 @@ public class FileDownloader {
                                 }
                                 long speed = (total / usedTime); // 平均每秒下载速度
                                 // 如果进度与之前进度相等，则不更新，如果更新太频繁，则会造成界面卡顿
-                                if (progress > 0 && progress != lastProgress) {
+                                if (progress != lastProgress) {
                                     downloadInfo.setSpeed(speed);
                                     downloadInfo.setProgress(progress);
                                     downloadInfo.setCurrentSize(total);
                                     progressHandler.sendMessage(DownloadProgressHandler.DOWNLOAD_PROGRESS, downloadInfo);
                                 }
+                                lastProgress = progress;
                             }
                             fos.flush();
                             downloadInfo.setFile(file);
@@ -169,12 +169,11 @@ public class FileDownloader {
                                     }
                                     fos = new FileOutputStream(file);
                                     int progress = 0;
-                                    int lastProgress = 0;
+                                    int lastProgress = -1;
                                     long startTime = System.currentTimeMillis(); // 开始下载时获取开始时间
                                     while ((len = inputStream.read(buf)) != -1) {
                                         fos.write(buf, 0, len);
                                         total += len;
-                                        lastProgress = progress;
                                         progress = (int) (total * 100 / responseLength);
                                         long curTime = System.currentTimeMillis();
                                         long usedTime = (curTime - startTime) / 1000;
@@ -183,12 +182,13 @@ public class FileDownloader {
                                         }
                                         long speed = (total / usedTime); // 平均每秒下载速度
                                         // 如果进度与之前进度相等，则不更新，如果更新太频繁，则会造成界面卡顿
-                                        if (progress > 0 && progress != lastProgress) {
+                                        if (progress != lastProgress) {
                                             downloadInfo.setSpeed(speed);
                                             downloadInfo.setProgress(progress);
                                             downloadInfo.setCurrentSize(total);
                                             emitter.onNext(downloadInfo);
                                         }
+                                        lastProgress = progress;
                                     }
                                     fos.flush();
                                     downloadInfo.setFile(file);
