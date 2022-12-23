@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.sjl.net.dowload.DownloadApi;
+import com.sjl.net.dowload.DownloadInfo;
 import com.sjl.net.dowload.DownloadProgressHandler;
 import com.sjl.net.dowload.FileDownloader;
 import com.sjl.net.util.FileUtils;
@@ -25,6 +26,9 @@ public class FileDownloadActivity extends BaseActivity {
     TextView mFileSize;
     @Bind(R.id.tv_msg)
     TextView tv_msg;
+
+    @Bind(R.id.tv_time)
+    TextView mTime;
 
     public static final String ROOT_PATH = Environment.getExternalStorageDirectory() + File.separator;// sd路径
     /**
@@ -48,12 +52,12 @@ public class FileDownloadActivity extends BaseActivity {
     }
 
 
-
     protected void initData() {
 
     }
 
     public void download1(View view) {
+        FileDownloader.cancelDownload();
         DownloadApi apiService = RetrofitHelper.getInstance().getApiService(DownloadApi.class);
         String url = "https://imtt.dd.qq.com/16891/apk/AB92915374D251277B4EF3465ECB751E.apk?fsname=cn.gov.tax.its_1.5.5_10505.apk&csr=1bbd";
         Observable<ResponseBody> responseBodyObservable = apiService.downLoad(url);
@@ -61,54 +65,65 @@ public class FileDownloadActivity extends BaseActivity {
 
 
             @Override
-            public void onProgress(int progress, long total, long speed) {
+            public void onProgress(DownloadInfo downloadInfo) {
+                int progress = downloadInfo.getProgress();
+                long fileSize = downloadInfo.getFileSize();
+                long speed = downloadInfo.getSpeed();
+                long usedTime = downloadInfo.getUsedTime();
                 mProgress.setText(progress + "%");
-                mFileSize.setText(FileUtils.formatFileSize(total));
+                mFileSize.setText(FileUtils.formatFileSize(fileSize));
                 mRate.setText(FileUtils.formatFileSize(speed) + "/s");
+                mTime.setText(FileUtils.formatTime(usedTime));
             }
 
             @Override
             public void onCompleted(File file) {
-                showMsg("下载完成："+file.getAbsolutePath());
+                showMsg("下载完成：" + file.getAbsolutePath());
             }
 
             @Override
             public void onError(Throwable e) {
-                showMsg("下载文件异常:"+e.getMessage());
+                showMsg("下载文件异常:" + e.getMessage());
             }
         });
     }
 
     private void showMsg(String message) {
-        if (isDestroy(this)){
+        if (isDestroy(this)) {
             return;
         }
         tv_msg.setText(message);
     }
 
     public void download2(View view) {
+        FileDownloader.cancelDownload();
         DownloadApi apiService = RetrofitHelper.getInstance().getApiService(DownloadApi.class);
-        String url = "https://cc849cacb0e96648f8dd4bb35ff8365b.dd.cdntips.com/imtt.dd.qq.com/16891/5BB89032B0755F5922C80DA8C2CAF735.apk?mkey=5c415b9fb711c35d&f=07b4&fsname=com.tencent.mobileqq_7.9.7_994.apk&csr=1bbd&cip=183.17.229.168&proto=https";
+        String url = "https://imtt.dd.qq.com/16891/apk/AB92915374D251277B4EF3465ECB751E.apk?fsname=cn.gov.tax.its_1.5.5_10505.apk&csr=1bbd";
         Observable<ResponseBody> responseBodyObservable = apiService.downLoad(url);
         FileDownloader.downloadFile2(responseBodyObservable, DOWNLOAD_APK_PATH, "test2.apk", new DownloadProgressHandler() {
 
 
             @Override
-            public void onProgress(int progress, long total, long speed) {
+            public void onProgress(DownloadInfo downloadInfo) {
+                int progress = downloadInfo.getProgress();
+                long fileSize = downloadInfo.getFileSize();
+                long speed = downloadInfo.getSpeed();
+                long usedTime = downloadInfo.getUsedTime();
                 mProgress.setText(progress + "%");
-                mFileSize.setText(FileUtils.formatFileSize(total));
+                mFileSize.setText(FileUtils.formatFileSize(fileSize));
                 mRate.setText(FileUtils.formatFileSize(speed) + "/s");
+                mTime.setText(FileUtils.formatTime(usedTime));
             }
 
             @Override
             public void onCompleted(File file) {
-                showMsg("下载完成："+file.getAbsolutePath());
+                showMsg("下载完成：" + file.getAbsolutePath());
             }
 
             @Override
             public void onError(Throwable e) {
                 //异常请检查路径，网络等因素
-                showMsg("下载文件异常:"+e.getMessage());
+                showMsg("下载文件异常:" + e.getMessage());
             }
         });
     }
@@ -120,28 +135,34 @@ public class FileDownloadActivity extends BaseActivity {
     }
 
     public void download3(View view) {
+        FileDownloader.cancelDownload();
         DownloadApi apiService = RetrofitHelper.getInstance().getApiService(DownloadApi.class);
-        String url="https://cc849cacb0e96648f8dd4bb35ff8365b.dd.cdntips.com/imtt.dd.qq.com/16891/BEC5EEF53983300D9F0AB46166EC9EA7.apk?mkey=5c41a20bda11e60f&f=184b&fsname=com.tencent.pao_1.0.61.0_161.apk&csr=1bbd&cip=218.17.192.250&proto=https";
+        String url = "https://imtt.dd.qq.com/16891/apk/B168BCBBFBE744DA4404C62FD18FFF6F.apk?fsname=com.tencent.tmgp.sgame_1.61.1.6_61010601.apk&csr=1bbd";
         Observable<ResponseBody> responseBodyObservable = apiService.downLoad(url);
 
         FileDownloader.downloadFile2(responseBodyObservable, DOWNLOAD_APK_PATH, "test3.apk", new DownloadProgressHandler() {
 
 
             @Override
-            public void onProgress(int progress, long total, long speed) {
+            public void onProgress(DownloadInfo downloadInfo) {
+                int progress = downloadInfo.getProgress();
+                long fileSize = downloadInfo.getFileSize();
+                long speed = downloadInfo.getSpeed();
+                long usedTime = downloadInfo.getUsedTime();
                 mProgress.setText(progress + "%");
-                mFileSize.setText(FileUtils.formatFileSize(total));
+                mFileSize.setText(FileUtils.formatFileSize(fileSize));
                 mRate.setText(FileUtils.formatFileSize(speed) + "/s");
+                mTime.setText(FileUtils.formatTime(usedTime));
             }
 
             @Override
             public void onCompleted(File file) {
-                showMsg("下载完成："+file.getAbsolutePath());
+                showMsg("下载完成：" + file.getAbsolutePath());
             }
 
             @Override
             public void onError(Throwable e) {
-                showMsg("下载文件异常:"+e.getMessage());
+                showMsg("下载文件异常:" + e.getMessage());
             }
         });
     }

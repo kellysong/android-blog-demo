@@ -15,10 +15,21 @@ public class DownloadInfo {
     private File file;
     private String fileName;
     private long fileSize;//单位 byte
-    private long currentSize;//当前下载大小
+
+    private long currentSize;//当前已下载大小
     private int progress;//当前下载进度
     private long speed;//下载速率
+    private long usedTime;//下载用时
     private Throwable errorMsg;//下载异常信息
+
+    public long getUsedTime() {
+        return usedTime;
+    }
+
+    public void setUsedTime(long usedTime) {
+        this.usedTime = usedTime;
+    }
+
 
 
     public File getFile() {

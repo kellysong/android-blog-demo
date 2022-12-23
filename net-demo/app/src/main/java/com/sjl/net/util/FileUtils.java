@@ -141,4 +141,17 @@ public class FileUtils {
         return filePath.substring(start, end);
     }
 
+    public static String formatTime(long time) {
+        String temp;
+        if (time >= 60 && time <= 3600) {
+            temp = Long.valueOf(time / 60) + "分" + time % 60 + "秒";
+        } else {
+            if (time > 3600) {
+                temp = Long.valueOf(time / 3600) + "小时" + Long.valueOf(((time % 3600) / 60)) + "分" + time % 60 + "秒";
+            } else {
+                temp = time + "秒";
+            }
+        }
+        return temp;
+    }
 }

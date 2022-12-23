@@ -43,7 +43,7 @@ public abstract class DownloadProgressHandler implements DownloadCallBack {
                 removeMessage();
                 break;
             case DOWNLOAD_PROGRESS://下载中
-                onProgress(progressBean.getProgress(), progressBean.getFileSize(),progressBean.getSpeed());
+                onProgress(progressBean);
                 break;
             case DOWNLOAD_FAIL://下载失败
                 onError(progressBean.getErrorMsg());

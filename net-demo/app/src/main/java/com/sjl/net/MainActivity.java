@@ -17,7 +17,6 @@ public class MainActivity extends BaseActivity {
 
 
     protected void initView() {
-        setContentView(R.layout.main_activity);
     }
 
     protected void initListener() {
@@ -55,4 +54,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    public void downloadTest2(View view) {
+        openActivity(MultiThreadDownloadActivity.class);
+    }
 }
